@@ -1,7 +1,7 @@
 from django.db import models
 
 # Create your models here.
-class categori(models.Model):    
+class Category(models.Model):    
     name = models.CharField(max_length=155)
     parent = models.ForeignKey('self',null=True,blank=True,on_delete=models.SET_NULL,related_name='children')
 
@@ -14,10 +14,10 @@ class categori(models.Model):
         return f'{self.name}'
     
 
-class brand(models.Model):
+class Brand(models.Model):
     name = models.CharField(max_length=155)
     brandimage = models.ImageField(upload_to='brand/%Y/%m/%d/')
-    categori = models.ForeignKey(categori,on_delete=models.CASCADE,related_name='brands')
+    categori = models.ForeignKey(Category,on_delete=models.CASCADE,related_name='brands')
 
     def __str__(self):
         return f'{self.name}'

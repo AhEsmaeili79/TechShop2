@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.utils import timezone
+from datetime import timedelta
 
 # Date Shamsi
 from django.utils import timezone
@@ -67,3 +69,17 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return f'{self.username}'
+    
+
+
+# token for rest password
+class Token(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    token = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_expired(self):
+        return self.created_at + timedelta(minutes=10) < timezone.now()
+
+    def __str__(self):
+        return f"{self.user.username} - {self.token}"
