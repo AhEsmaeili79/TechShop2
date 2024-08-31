@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from persiantools.jdatetime import JalaliDate
 import pytz
+from datetime import timedelta
 
 def get_persian_datetime():
     iran_tz = pytz.timezone('Asia/Tehran')
@@ -40,14 +41,14 @@ class CustomUser(AbstractUser):
 
 
 
-# # token for rest password
-# class Token(models.Model):
-#     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-#     token = models.CharField(max_length=255)
-#     created_at = models.DateTimeField(auto_now_add=True)
+# token for rest password
+class Token(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    token = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
 
-#     def is_expired(self):
-#         return self.created_at + timedelta(minutes=10) < timezone.now()
+    def is_expired(self):
+        return self.created_at + timedelta(minutes=10) < timezone.now()
 
-#     def __str__(self):
-#         return f"{self.user.username} - {self.token}"
+    def __str__(self):
+        return f"{self.user.username} - {self.token}"
