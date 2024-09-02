@@ -48,7 +48,7 @@ class Token(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def is_expired(self):
-        return self.created_at + timedelta(minutes=10) < timezone.now()
+        return self.created_at + timedelta(minutes=200) < timezone.now()
 
     def __str__(self):
         return f"{self.user.username} - {self.token}"

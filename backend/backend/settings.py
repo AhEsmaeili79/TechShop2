@@ -169,9 +169,15 @@ REST_FRAMEWORK = {
     ),
 }
 
-AUTHENTICATION_BACKENDS = (
+# AUTHENTICATION_BACKENDS = (
+#     'django.contrib.auth.backends.ModelBackend',
+# )
+
+
+AUTHENTICATION_BACKENDS = [
+    'accounts.backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend',
-)
+]
 
 
 CORS_ALLOWED_ORIGINS = [
@@ -192,3 +198,23 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=10),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
 }
+
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+}
+
+
+# 'DEFAULT_PERMISSION_CLASSES': [
+#    'rest_framework.permissions.AllowAny',
+# ]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
