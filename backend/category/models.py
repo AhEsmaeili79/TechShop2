@@ -5,8 +5,6 @@ class Category(models.Model):
     name = models.CharField(max_length=155)
     parent = models.ForeignKey('self',null=True,blank=True,on_delete=models.SET_NULL,related_name='children')
 
-
-
     class meta:
         verbose_name_plural= "Categories"
     

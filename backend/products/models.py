@@ -21,4 +21,3 @@ class Product(models.Model):
 
     def __str__(self):
         return f' ProductName: {self.name} Product Category: self.category.name Count: {self.count} , Seller: {self.seller}'
-

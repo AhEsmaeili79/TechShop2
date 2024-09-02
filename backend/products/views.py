@@ -22,3 +22,11 @@ def add_product(request):
         serializer.save()  # The seller will be automatically set in the serializer
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(['GET'])
+def get_products(request):
+    product = Product.objects.all()
+    serializeData = ProductSerializer(product,many=True).data
+    return Response(serializeData)
