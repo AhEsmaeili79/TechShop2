@@ -5,21 +5,18 @@ from rest_framework.authtoken.models import Token
 from django.contrib.auth import authenticate, login as auth_login, logout
 from .models import CustomUser
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .serializer import UserSerilizer,UpdateProfileSerializer,Profiledetail
+from .serializer import UserSerializer,UpdateProfileSerializer,Profiledetail
 from rest_framework import generics
 
 
 @api_view(['POST'])
 def signup(request):
-    data=request.data
-    serializer = UserSerilizer(data)
+    serializer = UserSerializer(data=request.data)  # Ensure data is passed here
     if serializer.is_valid():
         user = serializer.save()
         token, created = Token.objects.get_or_create(user=user)
         return Response({'token': token.key}, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 @api_view(['POST'])
 def login(request):
@@ -33,33 +30,38 @@ def login(request):
 
 
 
-@api_view(['POST'])
-def update_profile(request,id):
-    try:
-        user = CustomUser.objects.get(id=id)
-    except user.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    
-    if request.method == 'POST':
-        data = request.data
-        serializer = UpdateProfileSerializer(user,data)
-        if serializer.is_valid():
-            user = serializer.save()
-            return Response(serializer.data,status=status.HTTP_200_OK)
+@api_view(['PUT'])
+def update_profile(request):
+    user = request.user
+    serializer = UserSerializer(user, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-     
-
-@api_view(["GET"])
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout_view(request):
-    request.auth.delete()  # Delete the token upon logout
+    # Get the token from the request
+    auth_header = request.headers.get('Authorization')
+    if auth_header:
+        token_key = auth_header.split(' ')[1]
+        
+        # Delete the token from the database
+        try:
+            token = Token.objects.get(key=token_key)
+            token.delete()
+        except Token.DoesNotExist:
+            return Response({'error': 'Invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    # Perform Django logout
     logout(request)
+    
     return Response({'message': 'Logout successful'}, status=status.HTTP_200_OK)
 
-
-
-class UserDetail(generics.RetrieveAPIView):
-    queryset = CustomUser.objects.all()
-    serializer_class = Profiledetail
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def UserDetail(request):
+    user = request.user
+    serializer = Profiledetail(user)
+    return Response(serializer.data)
