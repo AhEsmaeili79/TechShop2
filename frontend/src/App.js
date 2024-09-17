@@ -9,6 +9,7 @@ import HomePage from './pages/HomePage';
 import UpdateProfilePage from './pages/UpdateProfilePage';
 import ProtectedRoute from './components/ProtectedRoute';  // Ensure this path is correct
 
+
 const App = () => {
   const token = localStorage.getItem('token');
 
