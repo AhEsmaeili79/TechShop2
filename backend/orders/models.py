@@ -30,11 +30,21 @@ persian_date, persian_time = get_persian_datetime()
 
 class Order(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.DO_NOTHING)
-    products = models.ManyToManyField(Product, through="OrderItem")
-    order_id = models.CharField(max_length=255, unique=True)
     transation_code = models.CharField(max_length=255, unique=True)
     date = models.DateField(default=persian_date)
     time = models.TimeField(default=persian_time)
+
+    PAYMENT_STATUS_PENDING = "P"
+    PAYMENT_STATUS_COMPLETE = "C"
+    PAYMENT_STATUS_FAILED = "F"
+    PAYMENT_STATUS_CHOICES = [
+        (PAYMENT_STATUS_PENDING, "Pending"),
+        (PAYMENT_STATUS_COMPLETE, "Complete"),
+        (PAYMENT_STATUS_FAILED, "Failed"),
+    ]
+    payment_status = models.CharField(
+        max_length=1, choices=PAYMENT_STATUS_CHOICES, default=PAYMENT_STATUS_PENDING
+    )
 
     def __str__(self):
         return f"Order {self.order_id} by {self.user.username}"
