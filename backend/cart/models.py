@@ -1,28 +1,33 @@
 from django.db import models
-from products.models import Product
-from accounts.models import CustomUser
-from uuid import uuid4
-
-# Create your models here.
+from django.conf import settings
+from product.models import Product,Color 
 
 
-# Create your models here.
 class Cart(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid4)
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    product = models.ManyToManyField(Product, through="CartItem")
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username}'s Cart"
+        return f"Cart of {self.user.username}"
+
+    @property
+    def total_price(self):
+        return sum(item.total_price for item in self.cart_items.all())
 
 
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, related_name="cart_items", on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.PositiveIntegerField()
-
-    class Meta:
-        unique_together = [["cart", "product"]]
-
+    color = models.ForeignKey(Color, on_delete=models.PROTECT)
+    quantity = models.PositiveIntegerField(default=1)
     def __str__(self):
-        return f"{self.product.name} in {self.cart.user.username}'s cart and quantity of {self.quantity}"
+        return f"{self.product.name} in {self.cart.user.username}'s cart"
+
+    @property
+    def total_price(self):
+        return self.product.price * self.quantity
+
+
+def get_or_create_cart(user):
+    cart, created = Cart.objects.get_or_create(user=user)
+    return cart
